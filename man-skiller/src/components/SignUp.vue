@@ -31,7 +31,6 @@ export default {
             role: "",
             bio: "",
             date: "",
-
             email: "",
             password: ""
         }
@@ -55,7 +54,6 @@ export default {
                 // localStorage.setItem("user-info", JSON.stringify(result.data))
                 this.$router.push({ name: 'DashBoard' })
             }
-
         }
     },
     // mounted() {
