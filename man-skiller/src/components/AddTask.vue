@@ -26,7 +26,7 @@ import NavBar from './NavBar.vue';
 import axios from "axios"
 
 export default {
-    name: "AddProject",
+    name: "AddTask",
     components: {
         NavBar
     },

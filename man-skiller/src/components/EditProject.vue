@@ -2,7 +2,7 @@
     
 <template>
     <NavBar></NavBar>
-    <h1>Add Project</h1>
+    <h1>Edit Project</h1>
     <div class="register">
         <input type="text" placeholder="Enter Project Name" v-model="name">
 
@@ -14,7 +14,7 @@
         <input type="date" placeholder="Enter End Date" v-model="e_date">
 
 
-        <button v-on:click="signup()">Add Project</button>
+        <button v-on:click="signup()">Edit Project</button>
 
     </div>
 </template>
@@ -26,7 +26,7 @@ import NavBar from './NavBar.vue';
 import axios from "axios"
 
 export default {
-    name: "AddProject",
+    name: "EditProject",
     components: {
         NavBar
     },

@@ -71,13 +71,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Project 1</td>
-                            <td>In Progress</td>
-                            <td>John Doe</td>
-                            <td>2023-07-19</td>
-                            <td>2023-08-31</td>
+                        <tr v-for="project in projects" :key="project._id">
+                            <td>{{ project._id }}</td>
+                            <td>{{ project.name }}</td>
+                            <td>{{ project.status }}</td>
+                            <td>{{ project.managerName }}</td>
+                            <td>{{ project.s_date }}</td>
+                            <td>{{ project.e_date }}</td>
                             <td>
                                 <button class="action-btn view-btn">View</button>
                                 <button class="action-btn edit-btn">Edit</button>
@@ -117,18 +117,51 @@
   
 <script>
 import NavBar from './NavBar.vue';
+import axios from "axios"
 
 export default {
     name: "DashBoard",
     components: {
         NavBar
+    },
+    data() {
+        return {
+            name: '',
+            projects: []
+        }
+    },
+
+    methods: {
+        async fetchManagerName(managerId) {
+            const response = await axios.get(`http://localhost:5000/portfolio-managers/${managerId}`);
+            return response.data.name;
+        },
+
+        async loadData() {
+            let user = await axios.get("http://127.0.0.1:5000/portfolio-managers/64b955af822102f471219e24")
+            this.name = user.name
+            if (!user) {
+                this.$router.push({ name: 'SignUp' })
+            }
+            let result = await axios.get("http://localhost:5000/projects/manager/64b955af822102f471219e24");
+            const projectsWithManagerName = await Promise.all(result.data.map(async (project) => {
+                const managerName = await this.fetchManagerName(project.manager_id);
+                return { ...project, managerName };
+            }));
+
+            this.projects = projectsWithManagerName;
+        }
+    },
+
+    async mounted() {
+        this.loadData();
     }
 }
 </script>
   
 <style scoped>
 /* Add custom styles for the Dashboard page here */
-body{
+body {
     background-color: #28a745;
 }
 
@@ -136,58 +169,59 @@ body{
 
 /* New styles for advanced and interactive effects in user info section */
 #user-info {
-  background-color: #329dea;
-  color: #ffffff;
-  padding: 40px 0;
-  text-align: center;
+    background-color: #329dea;
+    color: #ffffff;
+    padding: 40px 0;
+    text-align: center;
 }
 
 .user-info-container {
-  max-width: 800px;
-  margin: 0 auto;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
 /* Add a subtle animation effect to the user info section */
 #user-info {
-  animation: fadeInDown 0.8s ease;
+    animation: fadeInDown 0.8s ease;
 }
 
 @keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Add a hover effect to the h2 text */
 h2:hover {
-  color: #f9f9f9;
+    color: #f9f9f9;
 }
 
 /* Add a button-like appearance to the user info container */
 .user-info-container {
     width: 90%;
     background-color: #9e8f8f;
-  display: inline-block;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(32, 23, 23, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: inline-block;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(32, 23, 23, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .user-info-container:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
 }
 
 
@@ -198,71 +232,74 @@ h2:hover {
 
 /* Updated background colors for portfolio overview section */
 #portfolio-overview {
-    
-  text-align: center;
-  margin-top: 10px;
-  background-color: #f5f7fa; /* Light gray background */
-  padding: 40px 0;
+
+    text-align: center;
+    margin-top: 10px;
+    background-color: #f5f7fa;
+    /* Light gray background */
+    padding: 40px 0;
 }
 
 h2 {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
 }
 
 .metrics {
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
 }
 
 .metric {
-  padding: 15px 20px;
-  margin: 0 10px;
-  background-color: #fff; /* White background */
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
+    padding: 15px 20px;
+    margin: 0 10px;
+    background-color: #fff;
+    /* White background */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
 }
 
 .metric:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .metric-label {
-  font-size: 16px;
-  color: #666;
+    font-size: 16px;
+    color: #666;
 }
 
 .metric-value {
-  font-size: 24px;
-  color: #007bff;
-  font-weight: bold;
-  margin-top: 5px;
+    font-size: 24px;
+    color: #007bff;
+    font-weight: bold;
+    margin-top: 5px;
 }
 
 /* Add a subtle animation effect to metric values */
 .metric-value {
-  animation: fadeIn 0.8s ease;
+    animation: fadeIn 0.8s ease;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Add a gradient background to metric values on hover */
 .metric:hover .metric-value {
-  background: linear-gradient(90deg, #007bff, #0056b3);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 
