@@ -79,7 +79,7 @@
                             <td>{{ project.s_date }}</td>
                             <td>{{ project.e_date }}</td>
                             <td>
-                                <button class="action-btn view-btn">View</button>
+                                <router-link :to="`/view-project/${project._id}`" class="action-btn view-btn">View</router-link>
                                 <button class="action-btn edit-btn">Edit</button>
                                 <button class="action-btn delete-btn">Delete</button>
                                 <button class="action-btn view-task-list-btn">View Tasks</button>
@@ -94,6 +94,7 @@
                             <td>2023-09-15</td>
                             <td>
                                 <button class="action-btn view-btn">View</button>
+
                                 <button class="action-btn edit-btn">Edit</button>
                                 <button class="action-btn delete-btn">Delete</button>
                                 <button class="action-btn view-task-list-btn">View Tasks</button>
@@ -150,8 +151,16 @@ export default {
             }));
 
             this.projects = projectsWithManagerName;
-        }
+        },
+        handleClick() {
+            // Your click event handling logic goes here
+            console.log("Button clicked!");
+            this.$router.push({ name: 'ViewProject' });
+            // Perform other actions or call other methods as needed
+        },
+
     },
+
 
     async mounted() {
         this.loadData();

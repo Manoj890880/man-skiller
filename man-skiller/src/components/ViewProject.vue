@@ -1,4 +1,5 @@
 <template>
+    <H1>Project Details</H1>
     <div class="project-details">
         <h2 class="project-name">{{ project.name }}</h2>
         <div class="project-info">
@@ -6,13 +7,13 @@
                 <strong>Status:</strong> {{ project.status }}
             </div>
             <div class="detail">
-                <strong>Manager:</strong> {{ project.manager }}
+                <strong>Manager:</strong> {{ project.manager_id }}
             </div>
             <div class="detail">
-                <strong>Start Date:</strong> {{ project.startDate }}
+                <strong>Start Date:</strong> {{ project.s_date }}
             </div>
             <div class="detail">
-                <strong>End Date:</strong> {{ project.endDate }}
+                <strong>End Date:</strong> {{ project.e_date }}
             </div>
             <!-- Add other project details here -->
         </div>
@@ -41,35 +42,20 @@
             </ul>
         </div>
 
-        
+
     </div>
 </template>
   
 <script>
+import axios from 'axios';
+
 export default {
-    name: 'ProjectDetails',
+    name: 'ViewProject',
     data() {
         return {
-            project: {
-                name: 'Sample Project',
-                status: 'In Progress',
-                manager: 'John Doe',
-                startDate: '2023-07-20',
-                endDate: '2023-07-25',
-                description:
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu euismod arcu. Nullam vel sodales sapien.',
-                // Add other project details here
-            },
-            tasks: [
-                { id: 1, name: 'Task 1', status: 'In Progress' },
-                { id: 2, name: 'Task 2', status: 'Completed' },
-                // Add more tasks here...
-            ],
-            resources: [
-                { id: 1, name: 'Resource 1', type: 'Document' },
-                { id: 2, name: 'Resource 2', type: 'Video' },
-                // Add more resources here...
-            ],
+            project: {},
+            tasks: [],
+            resources: [],
         };
     },
     methods: {
@@ -85,7 +71,29 @@ export default {
             // Add your delete project logic here...
             console.log('Delete Project');
         }
-    }
+    },
+    async mounted() {
+        try {
+            // const projectId = this.$route.params.project_id; // Get the project_id from the route parameter
+
+            // Fetch project details
+            const projectResponse = await axios.get(`http://localhost:5000/projects/64b95e5a822102f471219e28`); // Replace with your project details API endpoint
+            console.log("Project Response:", projectResponse.data); 
+            this.project = projectResponse.data;
+
+            // Fetch tasks
+            //   const tasksResponse = await axios.get(`http://localhost:5000/projects/${projectId}/tasks`); // Replace with your tasks API endpoint
+            //   this.tasks = tasksResponse.data;
+
+            //   // Fetch resources
+            //   const resourcesResponse = await axios.get(`http://localhost:5000/projects/${projectId}/resources`); // Replace with your resources API endpoint
+            //   this.resources = resourcesResponse.data;
+        } catch (error) {
+            console.error('Error fetching project data:', error);
+        }
+
+
+    },
 };
 </script>
   
@@ -354,6 +362,7 @@ export default {
 
 .resource-item span {
     color: #666;
-}</style>
+}
+</style>
 
 

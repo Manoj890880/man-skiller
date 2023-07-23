@@ -11,5 +11,7 @@ const globalData = reactive({
 const app = createApp(App);
 app.config.globalProperties.$globalData = globalData;
 
+// Use the router
+app.use(router);
 
-createApp(App).use(router).mount('#app')
+app.mount('#app');

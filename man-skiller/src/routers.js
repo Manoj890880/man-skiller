@@ -11,13 +11,28 @@ import EditProject from './components/EditProject.vue'
 import AddTask from './components/AddTask.vue'
 import EditTask from './components/EditTask.vue'
 import TaskView from './components/TaskView.vue'
+import ViewResource from './components/ViewResource.vue'
+import AddResource from './components/ViewResource.vue'
+import LandPage from './components/LandPage.vue';
+import LogIn from './components/LogIn.vue';
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
+    name: 'LandPage',
+    component: LandPage,
+    path: '/',
+  },
+  {
+    name: 'LogIn',
+    component: LogIn,
+    path: '/log-in',
+  },
+
+  {
     name: 'SignUp',
     component: SignUp,
-    path: '/',
+    path: '/sign-up',
   },
 
   {
@@ -63,7 +78,7 @@ const routes = [
   {
     name: 'ViewProject',
     component: ViewProject,
-    path: '/view-project',
+    path: '/view-project/:id',
   },
   {
     name: 'EditProject',
@@ -84,6 +99,17 @@ const routes = [
     name: 'TaskView',
     component: TaskView,
     path: '/task-view',
+  },
+  {
+    name: 'ViewResource',
+    component: ViewResource,
+    path: '/view-resource',
+  },
+
+  {
+    name: 'AddResource',
+    component: AddResource,
+    path: '/add-resource',
   },
   
 ]
