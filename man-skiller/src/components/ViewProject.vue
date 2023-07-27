@@ -7,7 +7,7 @@
                 <strong>Status:</strong> {{ project.status }}
             </div>
             <div class="detail">
-                <strong>Manager:</strong> {{ project.manager_id }}
+                <strong>Manager:</strong> {{ project.manager_name }}
             </div>
             <div class="detail">
                 <strong>Start Date:</strong> {{ project.s_date }}
@@ -74,20 +74,35 @@ export default {
     },
     async mounted() {
         try {
-            // const projectId = this.$route.params.project_id; // Get the project_id from the route parameter
-
+            const projectId = this.$route.params.id; // Get the project_id from the route parameter
+            // console.log(projectId);
             // Fetch project details
-            const projectResponse = await axios.get(`http://localhost:5000/projects/64b95e5a822102f471219e28`); // Replace with your project details API endpoint
-            console.log("Project Response:", projectResponse.data); 
+            const projectResponse = await axios.get(`http://localhost:5000/projects/${projectId}`); // Replace with your project details API endpoint
+            // console.log("Project Response:", projectResponse.data); 
             this.project = projectResponse.data;
 
             // Fetch tasks
-            //   const tasksResponse = await axios.get(`http://localhost:5000/projects/${projectId}/tasks`); // Replace with your tasks API endpoint
-            //   this.tasks = tasksResponse.data;
-
+              const tasksResponse = await axios.get(`http://localhost:5000/projects/${projectId}/tasks`); // Replace with your tasks API endpoint
+              this.tasks = tasksResponse.data;
+                // console.log(this.tasks);
             //   // Fetch resources
-            //   const resourcesResponse = await axios.get(`http://localhost:5000/projects/${projectId}/resources`); // Replace with your resources API endpoint
-            //   this.resources = resourcesResponse.data;
+            const resourcePromises = this.tasks.map(async (task) => {
+                console.log('Fetching resources for task:', task._id);
+            const resourcesResponse = await axios.get(`http://localhost:5000/tasks/${task._id}/resources`);
+            console.log(resourcesResponse.data);
+            return resourcesResponse.data;
+            });
+
+        const resourcesArrays = await Promise.all(resourcePromises);
+
+        // Flatten the array of resource arrays and assign it to this.resources
+        this.resources = resourcesArrays.flat();
+        
+        const managerResponse = await axios.get(`http://localhost:5000/portfolio-managers/${this.project.manager_id}`);
+        this.project.manager_name = managerResponse.data.name; // Add manager_name to the project object
+
+
+
         } catch (error) {
             console.error('Error fetching project data:', error);
         }

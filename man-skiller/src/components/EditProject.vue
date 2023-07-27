@@ -1,25 +1,14 @@
-
-    
 <template>
     <NavBar></NavBar>
     <h1>Edit Project</h1>
     <div class="register">
-        <input type="text" placeholder="Enter Project Name" v-model="name">
-
-        <input type="text" placeholder="Enter status" v-model="status">
-
-
-
-        <input type="date" placeholder="Enter Start Date" v-model="s_date">
-        <input type="date" placeholder="Enter End Date" v-model="e_date">
-
-
-        <button v-on:click="signup()">Edit Project</button>
-
+        <input type="text" placeholder="Enter Project Name" v-model="project.name">
+        <input type="text" placeholder="Enter status" v-model="project.status">
+        <input type="date" placeholder="Enter Start Date" v-model="project.s_date">
+        <input type="date" placeholder="Enter End Date" v-model="project.e_date">
+        <button v-on:click="updateProject()">Edit Project</button>
     </div>
 </template>
-
-
 
 <script>
 import NavBar from './NavBar.vue';
@@ -32,38 +21,44 @@ export default {
     },
     data() {
         return {
-            name: "",
-            status: "",
-
-            s_date: "",
-            e_date: "",
-            manager_id: ""
-
+            project: {
+                name: "",
+                status: "",
+                s_date: "",
+                e_date: "",
+            }
         }
-
     },
     methods: {
-        async signup() {
-            let result = await axios.post("http://127.0.0.1:5000/projects", {
-                name: this.name,
-                status: this.status,
+        async updateProject() {
+            try {
+                const result = await axios.patch('http://localhost:5000/projects/' + this.$route.params.id, {
+                    name: this.project.name,
+                    status: this.project.status,
+                    s_date: this.project.s_date,
+                    e_date: this.project.e_date,
+                });
 
-                s_date: this.s_date,
-                e_date: this.e_date,
-                manager_id: "64b955af822102f471219e24"
-            })
-
-
-            if (result.status) {
-
-                // localStorage.setItem("user-info", JSON.stringify(result.data))
-                this.$router.push({ name: 'DashBoard' })
+                if (result.status === 200) {
+                    // The update was successful, you can handle it as needed
+                    // For example, redirecting to the dashboard
+                    this.$router.push({ name: 'DashBoard' });
+                } else {
+                    // Handle any potential errors or unsuccessful responses here
+                    // For example, display an error message to the user
+                    console.error('Failed to update project:', result.data);
+                }
+            } catch (error) {
+                // Handle any network errors here
+                console.error('Error updating project:', error);
             }
-
         }
     },
+    async mounted() {
+        const result = await axios.get("http://localhost:5000/projects/" + this.$route.params.id)
+        this.project = result.data
+    }
 }
-
 </script>
 
 

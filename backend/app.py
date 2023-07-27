@@ -126,5 +126,130 @@ def get_project(project_id):
         return jsonify({"message": "Internal server error"}), 500
 
 
+@app.route('/projects/<string:project_id>', methods=['DELETE'])
+def delete_project(project_id):
+    try:
+        # Find the project by its ID
+        project = db.projects.find_one({"_id": ObjectId(project_id)})
+        if not project:
+            return jsonify({"message": "Project not found"}), 404
+
+        # Delete the project
+        db.projects.delete_one({"_id": ObjectId(project_id)})
+
+        return jsonify({"message": "Project and associated tasks and resources deleted successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"message": "Error deleting project", "error": str(e)}), 500
+
+
+@app.route('/projects/<string:project_id>', methods=['PATCH'])
+def update_project(project_id):
+    updated_fields = request.json
+
+    # Convert project_id to ObjectId
+    project_id_object = ObjectId(project_id)
+
+    # Find the project using the ObjectId
+    project_to_update = db.projects.find_one({'_id': project_id_object}, {'_id': False})
+
+    if not project_to_update:
+        return jsonify({"message": "Project not found"}), 404
+
+    # Partially update the project with the provided fields
+    db.projects.update_one({"_id": project_id_object}, {"$set": updated_fields})
+
+    # Fetch the updated project after the update
+    updated_project = db.projects.find_one({'_id': project_id_object}, {'_id': False})
+
+    return jsonify({"message": "Project updated successfully", "project": updated_project})
+
+
+@app.route('/tasks', methods=['POST'])
+def create_task():
+    data = request.json
+    # Assuming you have a collection called "tasks" in your MongoDB
+    result = db.tasks.insert_one(data)
+    if result.inserted_id:
+        # Convert ObjectId to string for JSON serialization
+        data["_id"] = str(result.inserted_id)
+        return jsonify(data), 201
+    else:
+        return jsonify({"message": "Failed to create task"}), 500
+
+
+@app.route('/projects/<string:project_id>/tasks', methods=['GET'])
+def get_tasks_by_project_id(project_id):
+    # Assuming you have a collection called "tasks" in your MongoDB
+    tasks = db.tasks.find({"project_id": project_id})
+    task_list = []
+    for task in tasks:
+        task['_id'] = str(task['_id'])
+        task_list.append(task)
+    return jsonify(task_list), 200
+
+
+@app.route('/resources', methods=['POST'])
+def create_resource():
+    data = request.json
+    # Assuming you have a collection called "resources" in your MongoDB
+    result = db.resources.insert_one(data)
+    if result.inserted_id:
+        # Convert ObjectId to string for JSON serialization
+        data["_id"] = str(result.inserted_id)
+        return jsonify(data), 201
+    else:
+        return jsonify({"message": "Failed to create resource"}), 500
+
+
+@app.route('/tasks/<task_id>/resources', methods=['GET'])
+def get_resources_by_task_id(task_id):
+    try:
+        task_resources = db.resources.find({"task_id": task_id})
+        resources = [resource for resource in task_resources]
+
+        # Convert ObjectId to string for JSON serialization
+        for resource in resources:
+            resource["_id"] = str(resource["_id"])
+
+        return jsonify(resources)
+    except Exception as e:
+        return jsonify({"message": f"Error fetching resources: {str(e)}"}), 500
+
+
+@app.route('/tasks/<string:task_id>/resources', methods=['DELETE'])
+def delete_resources_for_task(task_id):
+    try:
+        # Find the task by its ID
+        task = db.tasks.find_one({"_id": ObjectId(task_id)})
+        if not task:
+            return jsonify({"message": "Task not found"}), 404
+
+        # Delete resources associated with the task
+        db.resources.delete_many({"task_id": task_id})
+
+        return jsonify({"message": "Resources deleted successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"message": "Error deleting resources", "error": str(e)}), 500
+
+
+@app.route('/projects/<string:project_id>/tasks', methods=['DELETE'])
+def delete_tasks_for_project(project_id):
+    try:
+        # Find the project by its ID
+        project = db.projects.find_one({"_id": ObjectId(project_id)})
+        if not project:
+            return jsonify({"message": "Project not found"}), 404
+
+        # Delete tasks associated with the project
+        db.tasks.delete_many({"project_id": project_id})
+
+        return jsonify({"message": "Tasks deleted successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"message": "Error deleting tasks", "error": str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run()

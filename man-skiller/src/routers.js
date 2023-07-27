@@ -83,7 +83,7 @@ const routes = [
   {
     name: 'EditProject',
     component: EditProject,
-    path: '/edit-project',
+    path: '/edit-project/:id',
   },
   {
     name: 'AddTask',

@@ -80,8 +80,9 @@
                             <td>{{ project.e_date }}</td>
                             <td>
                                 <router-link :to="`/view-project/${project._id}`" class="action-btn view-btn">View</router-link>
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
+                                <router-link :to="`/edit-project/${project._id}`" class="action-btn edit-btn">Edit</router-link>
+                                <!-- <button class="action-btn edit-btn">Edit</button> -->
+                                <button @click="deleteProject(project._id)" class="action-btn delete-btn">Delete</button>
                                 <button class="action-btn view-task-list-btn">View Tasks</button>
                             </td>
                         </tr>
@@ -152,12 +153,30 @@ export default {
 
             this.projects = projectsWithManagerName;
         },
-        handleClick() {
-            // Your click event handling logic goes here
-            console.log("Button clicked!");
-            this.$router.push({ name: 'ViewProject' });
-            // Perform other actions or call other methods as needed
-        },
+        
+        async deleteProject(projectId) {
+    try {
+      // First, fetch all tasks associated with the project
+      const tasksResponse = await axios.get(`http://localhost:5000/projects/${projectId}/tasks`);
+      const tasks = tasksResponse.data;
+
+      // Loop through each task and delete its associated resources
+      for (const task of tasks) {
+        await axios.delete(`http://localhost:5000/tasks/${task._id}/resources`);
+      }
+
+      // After deleting the resources, now delete the tasks
+      await axios.delete(`http://localhost:5000/projects/${projectId}/tasks`);
+
+      // Finally, delete the project itself
+      await axios.delete(`http://localhost:5000/projects/${projectId}`);
+
+      // After successful deletion, redirect to the dashboard or any other desired page
+      this.loadData();
+    } catch (error) {
+      console.error('Error deleting project:', error);
+    }
+  }
 
     },
 
